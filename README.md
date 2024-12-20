@@ -2,7 +2,7 @@
  * @Author: gxl
  * @Date: 2024-12-19 19:33:23
  * @LastEditors: Xiaolong Guo
- * @LastEditTime: 2024-12-19 22:51:10
+ * @LastEditTime: 2024-12-20
  * @FilePath: /uic/uic_design.md
  * @Description: UIC Design Doc.
 -->
@@ -17,9 +17,20 @@ Providing homogeneous interfaces for heterogeneous Inter-Connect.
 
 ## Structure
 
+### Room
+
+A room usually stands for a server or a client.
+
+### Portal
+
+A room has several portals. A portal can connect to another portal or anything else which can handle data.
 
 
 ### Inter Connect Way (IC-Way)
+
+A portal has several ic-ways, an ic-way means a connection channel. Ideally, we can always find the
+best IC-Way in a portal to send a message. The best means that the highest bandwidth or the lowest latency. 
+If there is an accident happened toward an IC-Way, other IC-Ways in the same portal can help with the task.
 
 IC-Way is the main concept of the library using in unix.
 
@@ -32,11 +43,10 @@ toward an IC-Way, other IC-Ways in the same group can help with the task.
 
 ### ID
 
-* ui_way ID
-* Server ID
-* TCP ID (ip + port)
+* portal_id
+* ic_way ID
 
-The id is an int, means that the unique identifier of a server connection.
+The id is an int64, means that the unique identifier.
 
 ### Priority
 

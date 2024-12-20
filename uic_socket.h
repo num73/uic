@@ -26,7 +26,7 @@ struct uic_socket_attr {
 
 };
 
-void uic_socket_init(int _flag, int _group_id, char* _ip, int _port);
+void uic_socket_init(int _flag, int _portal_id, char* _ip, int _port);
 
 #endif
 

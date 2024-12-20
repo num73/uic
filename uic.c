@@ -10,24 +10,45 @@
 #include <stdio.h>
 #include "uic_log.h"
 
+
+struct protal* portals_head;
+
 struct ic_way* ic_ways_head;
 
-static struct ic_way* choice_ic_way(int64_t _group_id) {
+
+static struct ic_way* choice_ic_way_in_portal(struct portal* _portal) {
+    int64_t priority = UIC_PRI_MIN;
+    struct ic_way* ret = NULL;
+    struct ic_way* p = _portal->ic_way_head;
+
+    while (p) {
+        if(p->priority > priority) {
+            priority = p->priority;
+            ret = p;
+        }
+
+        p = p->next_ic_way;
+    }
+    uic_dbg("Find ic way successfully, ic way id %ld:\n", ret->ic_way_id);
+    return ret;
+}
+
+static struct ic_way* choice_ic_way(int64_t _portal_id) {
 
     int64_t priority = UIC_PRI_MIN;
     struct ic_way* ret = NULL;
     struct ic_way* p = ic_ways_head;
 
     while (p) {
-        if (p->group_id == _group_id) {
+        if (p->portal_id == _portal_id) {
             if(p->priority > priority) {
                 priority = p->priority;
                 ret = p;
             }
         }
-        uic_dbg("Find ic way successfully, ic way id %ld:\n", p->ic_way_id);
         p = p->next_ic_way;
     }
+    uic_dbg("Find ic way successfully, ic way id %ld:\n", ret->ic_way_id);
     return ret;
 
 }
@@ -44,11 +65,11 @@ static struct ic_way* ic_way_by_way_id(int64_t _ic_way_id) {
 }
 
 
-// return an ic_way in the group of _group_id
-static struct ic_way* ic_way_by_groupid(int64_t _group_id) {
+// return an ic_way in the portal of _portal_id
+static struct ic_way* ic_way_by_portal_id(int64_t _portal_id) {
     struct ic_way* p = ic_ways_head;
     while (p) {
-        if (p->group_id == _group_id) {
+        if (p->portal_id == _portal_id) {
             return p;
         }
         p = p->next_ic_way;
@@ -151,10 +172,10 @@ int uic_send(int64_t _server_id, char* _buf, size_t _len) {
 }
 
 
-int uic_get_data(int64_t _group_id, char* _buf, size_t _len) {
+int uic_get_data(int64_t _portal_id, char* _buf, size_t _len) {
     struct ic_way* p = ic_ways_head;
     while (p) {
-        if (p->group_id == _group_id) {
+        if (p->portal_id == _portal_id) {
             if(p->get_data != NULL && p->state == UIC_CONNECTED && p->get_data(p->attr, _buf, _len) == UIC_SUCCESS) {
                     return UIC_SUCCESS;
             }

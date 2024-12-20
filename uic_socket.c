@@ -92,7 +92,7 @@ int uic_socket_get_data(void* attr, char* buf, size_t _len) {
     return UIC_SUCCESS;
 }
 
-void uic_socket_init(int _flag, int _group_id, char* _ip, int _port) {
+void uic_socket_init(int _flag, int _portal_id, char* _ip, int _port) {
 
     uic_info("uic_socket_init\n");
     uic_info("uic_socket_init, ip: %s\n", _ip);
@@ -109,7 +109,7 @@ void uic_socket_init(int _flag, int _group_id, char* _ip, int _port) {
     uca.address.sin_port = htons(_port);
 
     icw.ic_way_id = wid_tag++;
-    icw.group_id = _group_id;
+    icw.portal_id = _portal_id;
     icw.priority = 0;
     icw.state = UIC_LONELY;
     icw.connect = uic_socket_connect;
