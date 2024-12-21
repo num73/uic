@@ -21,6 +21,7 @@ int uic_socket_connect(void* attr) {
     struct uic_socket_attr *uca = (struct uic_socket_attr*)attr;
 
     if (uca->flag == UIC_SOCKET_SERVER) {
+        uic_dbg("uic_socket_connect: server detected\n");
         if ((uca->server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
             perror("socket failed");
             exit(EXIT_FAILURE);
@@ -46,6 +47,7 @@ int uic_socket_connect(void* attr) {
         uic_info("Connect to client successfully\n");
 
     } else if (uca->flag == UIC_SOCKET_CLIENT) {
+        uic_dbg("uic_socket_connect: client detected\n");
         uic_dbg("ip: %s\n", uca->ip);
         if ((uca->socket_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
             uic_error("\n Socket creation error \n");
@@ -110,14 +112,13 @@ void uic_socket_init(int _flag, int _portal_id, char* _ip, int _port) {
     uca->address.sin_port = htons(_port);
 
     icw->ic_way_id = wid_tag++;
-    icw->portal_id = _portal_id;
     icw->priority = 0;
     icw->state = UIC_LONELY;
     icw->connect = uic_socket_connect;
     icw->disconnect = uic_socket_disconnect;
     icw->get_data = uic_socket_get_data;
     icw->send_data = uic_socket_send_data;
-    icw->attr = uca;
-    register_ic_way(icw);
+    icw->ic_way_attr = uca;
+    register_ic_way(icw, _portal_id);
     uic_info("uic_socket register successful!\n");
 }
