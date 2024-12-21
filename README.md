@@ -9,6 +9,8 @@
 
 # Universal Inter Connect Library
 
+@author num73
+
 ## Goal
 
 A universal inter connect library.
@@ -25,6 +27,28 @@ A room usually stands for a server or a client.
 
 A room has several portals. A portal can connect to another portal or anything else which can handle data.
 
+Portal has a unique portal_id. The function `select_ic_way` can be set. If there is no `select_ic_way` in portal means that
+`select_ic_way` is NULL, `generic_selected_ic_way` will be used.
+
+
+```c
+
+struct portal {
+
+    int64_t portal_id;
+
+    char* portal_name;
+
+    struct ic_way *ic_way_head;
+
+    struct portal *next_portal;
+
+    struct ic_way* (*selected_ic_way)(const struct portal* portal);
+
+    void *portal_attr;
+};
+
+```
 
 ### Inter Connect Way (IC-Way)
 
@@ -34,12 +58,31 @@ If there is an accident happened toward an IC-Way, other IC-Ways in the same por
 
 IC-Way is the main concept of the library using in unix.
 
-Every IC-Way has an unique id named `ic_way_id`, an ic-way means a connection channel. Several IC-Ways can be grouped. 
+Every IC-Way has an unique id pair (`portal_id`, `ic_way_id`), an ic-way means a connection channel. Several IC-Ways can be grouped. 
 An IC-Way group usually have a same task, but they may have different bandwidth or latency. Ideally, we can always find the
 best IC-Way to send message. The best means that the highest bandwidth or the lowest latency. If there is an accident happened
 toward an IC-Way, other IC-Ways in the same group can help with the task.
 
+```c
+struct ic_way{
 
+    struct ic_way* next_ic_way;
+
+    int64_t ic_way_id;
+    //int64_t portal_id;
+    int64_t priority;
+
+    // UIC_CONNECTED, UIC_LONELY
+    int state;
+
+    int (*connect)(void* ic_way_attr);
+    int (*disconnect)(void* ic_way_attr);
+    int (*get_data)(void* ic_way_attr, char* buf, size_t len);
+    int (*send_data)(void* ic_way_attr, char* buf, size_t len);
+
+    void* ic_way_attr;
+};
+```
 
 ### ID
 
@@ -50,61 +93,39 @@ The id is an int64, means that the unique identifier.
 
 ### Priority
 
-The priority is an int, the biggest first.
+The priority is an int64, the biggest first.
 
 * Manual Priority Configuration.
-* Automatic Configuration Priority.
+* Automatic Configuration Priority. // todo
 
 ### API
 
-* register_ic_way
-* unregister_ic_way
-* uic_connect
-* uic_disconnect
-* uic_send
-* uic_get
 
-### Code Details
+* register_portal(_portal);
 
-```c
+* register_ic_way(_ic_way, _portal_id);
 
-struct ic_way{
+* unregister_ic_way(_ic_way_id, _portal_id);
 
-    struct ic_way* next_ic_way;
+* uic_connect(_portal_id);
 
-    int64_t ic_way_id;
-    int64_t group_id;
-    int priority;
-    // UIC_CONNECTED, UIC_LONELY
-    int state;
+* uic_connect_all(_portal_id); // todo
 
-    int (*connect)(void* attr);
-    int (*disconnect)(void* attr);
-    int (*get_data)(void* attr, char* buf, int size);
-    int (*send_data)(void* attr, char* buf, int size);
+* uic_disconnect(_portal_id);
 
-    void* attr;
-};
+* uic_disconnect_all(_portal_id); 
 
+* uic_send_data(_portal_id, _buf, _len);
 
-int register_ic_way(ic_way* _ic_way);
-int unregister_ic_way(ic_way* _ic_way);
+* uic_get_data(_portal_id, _buf, _len);
 
+* uic_get_data_through_way(_portal_id, _wid, _buf, _len); // todo
 
-// return ic_way id or -1
-int uic_connect(int server_id);
+## How to Use
 
-int uic_disconnect(int server_id);
+The `socket.c` and `socket.h` are the example of uic.
 
-int uic_send(int server_id, char* buf, int size);
-
-// need ite
-int uic_get(int server_id, char* buf, int size);
-
-int uic_get_by_wid(int wid, char* buf, int size);
-
-```
-
+Implement an IC-Way and register it!
 
 ## Potential
 
