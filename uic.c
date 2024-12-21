@@ -117,12 +117,10 @@ int unregister_ic_way(struct ic_way* _ic_way) {
 
 
 
+int uic_connect(int64_t _portal_id) {
+    uic_dbg("Connecting to portal %d ...\n", _portal_id);
+    struct ic_way* p = choice_ic_way(_portal_id);
 
-int uic_connect(int64_t _server_id) {
-    uic_dbg("Connecting to server %d ...\n", _server_id);
-    struct ic_way* p = choice_ic_way(_server_id);
-
-    uic_dbg("Get server successfully!\n", _server_id);
     if (p == NULL) {
         return UIC_FAIL;
     }
@@ -157,7 +155,7 @@ int uic_disconnect(int64_t _server_id) {
     }
 }
 
-int uic_send(int64_t _server_id, char* _buf, size_t _len) {
+int uic_send_data(int64_t _server_id, char* _buf, size_t _len) {
     uic_dbg("Sending data to server %d ...\n", _server_id);
     struct ic_way* p = choice_ic_way(_server_id);
 

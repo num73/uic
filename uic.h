@@ -63,7 +63,7 @@ int uic_connect(int64_t _portal_id);
 
 int uic_disconnect(int64_t _portal_id);
 
-int uic_send(int64_t _portal_id, char* _buf, size_t _len);
+int uic_send_data(int64_t _portal_id, char* _buf, size_t _len);
 
 // need ite
 int uic_get_data(int64_t _portal_id, char* _buf, size_t _len);

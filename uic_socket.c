@@ -16,8 +16,6 @@
 
 int64_t wid_tag = 0;
 
-struct uic_socket_attr uca;
-struct ic_way icw;
 
 int uic_socket_connect(void* attr) {
     struct uic_socket_attr *uca = (struct uic_socket_attr*)attr;
@@ -96,27 +94,30 @@ void uic_socket_init(int _flag, int _portal_id, char* _ip, int _port) {
 
     uic_info("uic_socket_init\n");
     uic_info("uic_socket_init, ip: %s\n", _ip);
-    uca.flag = _flag;
-    uca.opt = 1;
-    uca.port = _port;
-    uca.addr_len = sizeof(uca.address);
+    struct uic_socket_attr* uca = (struct uic_socket_attr*)malloc(sizeof(struct uic_socket_attr));
+    struct ic_way* icw = (struct ic_way* )malloc(sizeof(struct ic_way));
+    uca->flag = _flag;
+    uca->opt = 1;
+    uca->port = _port;
+    uca->addr_len = sizeof(uca->address);
 
-    uca.address.sin_family = AF_INET;
+    uca->address.sin_family = AF_INET;
+
     //uca.address.sin_addr.s_addr = INADDR_ANY;
 
-    uca.ip = malloc(sizeof(char)*strlen(_ip));
-    memcpy(uca.ip, _ip, strlen(_ip));
-    uca.address.sin_port = htons(_port);
+    uca->ip = malloc(sizeof(char)*strlen(_ip));
+    memcpy(uca->ip, _ip, strlen(_ip));
+    uca->address.sin_port = htons(_port);
 
-    icw.ic_way_id = wid_tag++;
-    icw.portal_id = _portal_id;
-    icw.priority = 0;
-    icw.state = UIC_LONELY;
-    icw.connect = uic_socket_connect;
-    icw.disconnect = uic_socket_disconnect;
-    icw.get_data = uic_socket_get_data;
-    icw.send_data = uic_socket_send_data;
-    icw.attr = &uca;
-    register_ic_way(&icw);
+    icw->ic_way_id = wid_tag++;
+    icw->portal_id = _portal_id;
+    icw->priority = 0;
+    icw->state = UIC_LONELY;
+    icw->connect = uic_socket_connect;
+    icw->disconnect = uic_socket_disconnect;
+    icw->get_data = uic_socket_get_data;
+    icw->send_data = uic_socket_send_data;
+    icw->attr = uca;
+    register_ic_way(icw);
     uic_info("uic_socket register successful!\n");
 }

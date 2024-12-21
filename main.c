@@ -11,7 +11,7 @@
 #include "uic_socket.h"
 #include <stdio.h>
 #include <string.h>
-char* buf[1024];
+char buf[1024];
 
 int main() {
 
@@ -24,7 +24,7 @@ int main() {
     //printf("%s\n", buf);
 
     fgets(buf, 1024, stdin);
-    uic_send(UIC_LOCAL_PORTAL, buf, strlen(buf)*sizeof(char));
+    uic_send_data(UIC_LOCAL_PORTAL, buf, strlen(buf)*sizeof(char));
 
     uic_disconnect(0);
 
