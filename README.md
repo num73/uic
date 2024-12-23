@@ -24,7 +24,7 @@ cmake .. && make -j4
 
 ```
 
-### How to use
+### Use as Library
 
 See the doc/design.md for details.
 
