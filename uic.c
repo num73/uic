@@ -1,8 +1,8 @@
 /*
  * @Author: gxl
  * @Date: 2024-12-20 09:08:53
- * @LastEditors: gxl
- * @LastEditTime: 2024-12-20 12:01:43
+ * @LastEditors: Xiaolong Guo
+ * @LastEditTime: 2024-12-26 10:03:19
  * @Description: Universal Inter Connect Library
  */
 #include "uic.h"
@@ -16,6 +16,7 @@
 struct portal* portals_head;
 
 static struct portal* portal_by_portal_id(const int64_t _portal_id) {
+    uic_dbg("portal_by_portal_id: portal_id: %ld", _portal_id);
     struct portal* p = portals_head;
     while (p) {
         if (p->portal_id == _portal_id) {
@@ -152,10 +153,14 @@ int uic_connect(int64_t _portal_id) {
 
 int uic_disconnect(int64_t _portal_id) {
 
+    uic_info("Disconnecting from portal %ld ...\n", _portal_id);
     struct portal* portal = portal_by_portal_id(_portal_id);
-
+    if(portal == NULL) {
+        uic_error("portal not found, portal_id: %ld", _portal_id);
+        return UIC_FAIL;
+    }
     struct ic_way* p = portal->selected_ic_way(portal);
-
+    uic_dbg("Disconnecting ic_way %ld ...\n", p->ic_way_id);
     if (p == NULL) {
         return UIC_FAIL;
     }
@@ -191,7 +196,7 @@ int uic_get_data(int64_t _portal_id, char* _buf, size_t _len) {
     struct ic_way* p = portal->ic_way_head;
     while (p) {
         if(p->get_data != NULL && p->state == UIC_CONNECTED && p->get_data(p->ic_way_attr, _buf, _len) == UIC_SUCCESS) {
-                    return UIC_SUCCESS;
+            return UIC_SUCCESS;
         }
         p = p->next_ic_way;
     }

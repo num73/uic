@@ -1,8 +1,8 @@
 /*
  * @Author: gxl
  * @Date: 2024-12-20 12:25:28
- * @LastEditors: gxl
- * @LastEditTime: 2024-12-20 13:22:25
+ * @LastEditors: Xiaolong Guo
+ * @LastEditTime: 2024-12-26 09:47:31
  * @FilePath: /uic/uic_socket.c
  * @Description:
  */
@@ -70,7 +70,8 @@ int uic_socket_connect(void* attr) {
 int uic_socket_disconnect(void* attr) {
     struct uic_socket_attr* p = (struct uic_socket_attr*)attr;
     close(p->socket_fd);
-    close(p->server_fd);
+    if(p->flag == UIC_SOCKET_SERVER)
+        close(p->server_fd);
     return UIC_SUCCESS;
 }
 
@@ -105,7 +106,7 @@ void uic_socket_init(int _flag, int _portal_id, char* _ip, int _port) {
 
     uca->address.sin_family = AF_INET;
 
-    //uca.address.sin_addr.s_addr = INADDR_ANY;
+    uca->address.sin_addr.s_addr = INADDR_ANY;
 
     uca->ip = malloc(sizeof(char)*strlen(_ip));
     memcpy(uca->ip, _ip, strlen(_ip));
